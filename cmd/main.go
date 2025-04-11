@@ -15,10 +15,11 @@ import (
 )
 
 var (
-	addr    string
-	version string
-	clients = make(map[*websocket.Conn]struct{})
-	mu      sync.RWMutex
+	addr     string
+	title    string
+	version  string
+	clients  = make(map[*websocket.Conn]struct{})
+	mu       sync.RWMutex
 )
 
 func readStdin() {
@@ -36,6 +37,7 @@ func readStdin() {
 
 func init() {
 	flag.StringVarP(&addr, "addr", "a", "127.0.0.1:8000", "ip:port to listen on")
+	flag.StringVarP(&title, "title", "t", "", "app title")
 	flag.BoolP("help", "h", false, "display usage help")
 	flag.BoolP("version", "v", false, "display version")
 	flag.CommandLine.SortFlags = false

@@ -9,9 +9,9 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-//go:embed index.html
+//go:embed index.html.tmpl
 var tmplFS embed.FS
-var tmpl = template.Must(template.ParseFS(tmplFS, "index.html"))
+var tmpl = template.Must(template.ParseFS(tmplFS, "index.html.tmpl"))
 
 func registerRoutes() {
 	http.HandleFunc("/", handleIndex)
@@ -40,7 +40,7 @@ func handleWS(ws *websocket.Conn) {
 
 func handleIndex(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if err := tmpl.Execute(w, nil); err != nil {
-		log.Println("error:", err)
+	if err := tmpl.Execute(w, struct{ Title string }{title}); err != nil {
+		log.Fatal("error:", err)
 	}
 }
