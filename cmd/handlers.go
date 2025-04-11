@@ -1,12 +1,17 @@
 package main
 
 import (
-	"fmt"
+	"embed"
+	"html/template"
 	"log"
 	"net/http"
 
 	"golang.org/x/net/websocket"
 )
+
+//go:embed index.html
+var tmplFS embed.FS
+var tmpl = template.Must(template.ParseFS(tmplFS, "index.html"))
 
 func registerRoutes() {
 	http.HandleFunc("/", handleIndex)
@@ -35,22 +40,7 @@ func handleWS(ws *websocket.Conn) {
 
 func handleIndex(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if _, err := fmt.Fprint(w, `
-<!DOCTYPE html>
-<html>
-<head><title>Stdin Mirror</title></head>
-<body>
-	<pre id="output"></pre>
-	<script>
-		const out = document.getElementById("output");
-		const ws = new WebSocket("ws://" + location.host + "/ws");
-		ws.onmessage = e => {
-			out.textContent += e.data;
-			window.scrollTo(0, document.body.scrollHeight);
-		};
-	</script>
-</body>
-</html>`); err != nil {
+	if err := tmpl.Execute(w, nil); err != nil {
 		log.Println("error:", err)
 	}
 }
