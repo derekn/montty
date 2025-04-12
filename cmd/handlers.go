@@ -6,22 +6,28 @@ import (
 	"log"
 	"net/http"
 
-	"golang.org/x/net/websocket"
+	"github.com/gorilla/websocket"
 )
 
 //go:embed index.html.tmpl
 var tmplFS embed.FS
-var tmpl = template.Must(template.ParseFS(tmplFS, "index.html.tmpl"))
+
+var (
+	tmpl     = template.Must(template.ParseFS(tmplFS, "index.html.tmpl"))
+	upgrader = websocket.Upgrader{}
+)
 
 func registerRoutes() {
 	http.HandleFunc("/", handleIndex)
-	http.Handle("/ws", websocket.Handler(handleWS))
+	http.HandleFunc("/ws", handleWS)
 }
 
-func handleWS(ws *websocket.Conn) {
-	mu.Lock()
-	clients[ws] = struct{}{}
-	mu.Unlock()
+func handleWS(w http.ResponseWriter, r *http.Request) {
+	ws, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println("error:", err)
+		return
+	}
 
 	defer func() {
 		mu.Lock()
@@ -30,9 +36,12 @@ func handleWS(ws *websocket.Conn) {
 		_ = ws.Close()
 	}()
 
-	buf := make([]byte, 1)
+	mu.Lock()
+	clients[ws] = struct{}{}
+	mu.Unlock()
+
 	for {
-		if _, err := ws.Read(buf); err != nil {
+		if _, _, err := ws.ReadMessage(); err != nil {
 			break
 		}
 	}

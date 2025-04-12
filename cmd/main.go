@@ -11,7 +11,6 @@ import (
 	"time"
 
 	flag "github.com/spf13/pflag"
-	"golang.org/x/net/websocket"
 )
 
 var (
@@ -25,13 +24,16 @@ var (
 func readStdin() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
-		data := []byte(scanner.Text() + "\n")
-		fmt.Print(string(data))
+		data := scanner.Bytes()
+		fmt.Println(string(data))
 		mu.RLock()
 		for ws := range clients {
-			_, _ = ws.Write(data)
+			_ = ws.WriteMessage(websocket.TextMessage, append(data, '\n'))
 		}
 		mu.RUnlock()
+	}
+	if err := scanner.Err(); err != nil {
+		log.Fatal("error:", err)
 	}
 }
 
