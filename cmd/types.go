@@ -38,3 +38,26 @@ func (c *Clients) Broadcast(msg []byte) {
 		_ = ws.WriteMessage(websocket.TextMessage, msg)
 	}
 }
+
+type LogBuffer struct {
+	ring *ring.Ring
+}
+
+func NewLogBuffer(size int) *LogBuffer {
+	return &LogBuffer{
+		ring: ring.New(size),
+	}
+}
+
+func (r *LogBuffer) AddLine(line []byte) {
+	r.ring.Value = append([]byte(nil), line...)
+	r.ring = r.ring.Next()
+}
+
+func (r *LogBuffer) Do(f func([]byte)) {
+	r.ring.Do(func(s any) {
+		if s, ok := s.([]byte); ok {
+			f(s)
+		}
+	})
+}

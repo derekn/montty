@@ -31,6 +31,10 @@ func handleWS(w http.ResponseWriter, r *http.Request) {
 	clients.Add(ws)
 	defer clients.Delete(ws)
 
+	// replay history for new clients
+	logBuffer.Do(func(line []byte) {
+		_ = ws.WriteMessage(websocket.TextMessage, append(line, '\n'))
+	})
 
 	for {
 		if _, _, err := ws.ReadMessage(); err != nil {

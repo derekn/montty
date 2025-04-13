@@ -17,6 +17,8 @@ var (
 	title         string
 	version       string
 	clients       *Clients
+	logBuffer     *LogBuffer
+	logBufferSize int
 )
 
 func readStdin() {
@@ -25,6 +27,7 @@ func readStdin() {
 		line := scanner.Bytes()
 		fmt.Printf("%s\n", line)
 		clients.Broadcast(append(line, '\n'))
+		logBuffer.AddLine(line)
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatal("error:", err)
@@ -34,6 +37,7 @@ func readStdin() {
 func init() {
 	flag.StringVarP(&addr, "addr", "a", "127.0.0.1:8000", "ip:port to listen on")
 	flag.StringVarP(&title, "title", "t", "", "app title")
+	flag.IntVarP(&logBufferSize, "buffer", "b", 500, "history lines to buffer")
 	flag.BoolP("help", "h", false, "display usage help")
 	flag.BoolP("version", "v", false, "display version")
 	flag.CommandLine.SortFlags = false
@@ -61,6 +65,7 @@ func main() {
 	flag.Parse()
 
 	clients = NewClients()
+	logBuffer = NewLogBuffer(int(logBufferSize))
 	registerRoutes()
 	go readStdin()
 
