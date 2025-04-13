@@ -7,30 +7,24 @@ import (
 	"net/http"
 	"os"
 	"runtime"
-	"sync"
 	"time"
 
 	flag "github.com/spf13/pflag"
 )
 
 var (
-	addr     string
-	title    string
-	version  string
-	clients  = make(map[*websocket.Conn]struct{})
-	mu       sync.RWMutex
+	addr          string
+	title         string
+	version       string
+	clients       *Clients
 )
 
 func readStdin() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
-		data := scanner.Bytes()
-		fmt.Println(string(data))
-		mu.RLock()
-		for ws := range clients {
-			_ = ws.WriteMessage(websocket.TextMessage, append(data, '\n'))
-		}
-		mu.RUnlock()
+		line := scanner.Bytes()
+		fmt.Printf("%s\n", line)
+		clients.Broadcast(append(line, '\n'))
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatal("error:", err)
@@ -66,6 +60,7 @@ func main() {
 	}
 	flag.Parse()
 
+	clients = NewClients()
 	registerRoutes()
 	go readStdin()
 

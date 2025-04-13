@@ -28,17 +28,9 @@ func handleWS(w http.ResponseWriter, r *http.Request) {
 		log.Println("error:", err)
 		return
 	}
+	clients.Add(ws)
+	defer clients.Delete(ws)
 
-	defer func() {
-		mu.Lock()
-		delete(clients, ws)
-		mu.Unlock()
-		_ = ws.Close()
-	}()
-
-	mu.Lock()
-	clients[ws] = struct{}{}
-	mu.Unlock()
 
 	for {
 		if _, _, err := ws.ReadMessage(); err != nil {
