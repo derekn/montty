@@ -30,7 +30,7 @@ func readStdin() {
 		logBuffer.AddLine(line)
 	}
 	if err := scanner.Err(); err != nil {
-		log.Fatal("error:", err)
+		log.Fatal("error reading stdin:", err)
 	}
 }
 

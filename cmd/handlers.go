@@ -25,7 +25,7 @@ func registerRoutes() {
 func handleWS(w http.ResponseWriter, r *http.Request) {
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println("error:", err)
+		log.Println("upgrade connection error:", err)
 		return
 	}
 	clients.Add(ws)
@@ -33,7 +33,10 @@ func handleWS(w http.ResponseWriter, r *http.Request) {
 
 	// replay history for new clients
 	logBuffer.Do(func(line []byte) {
-		_ = ws.WriteMessage(websocket.TextMessage, append(line, '\n'))
+		if err := ws.WriteMessage(websocket.TextMessage, append(line, '\n')); err != nil {
+			log.Println("new connection error:", err)
+			return
+		}
 	})
 
 	for {
@@ -46,6 +49,6 @@ func handleWS(w http.ResponseWriter, r *http.Request) {
 func handleIndex(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := tmpl.Execute(w, struct{ Title string }{title}); err != nil {
-		log.Fatal("error:", err)
+		log.Fatal("template error:", err)
 	}
 }
