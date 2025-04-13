@@ -48,7 +48,7 @@ func handleWS(w http.ResponseWriter, r *http.Request) {
 
 func handleIndex(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if err := tmpl.Execute(w, struct{ Title string }{title}); err != nil {
+	if err := tmpl.Execute(w, struct{ AppName, Title string }{appName, title}); err != nil {
 		log.Fatal("template error:", err)
 	}
 }

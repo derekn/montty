@@ -12,6 +12,8 @@ import (
 	flag "github.com/spf13/pflag"
 )
 
+const appName = "montty"
+
 var (
 	addr          string
 	title         string
@@ -43,7 +45,7 @@ func init() {
 	flag.CommandLine.SortFlags = false
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "pipe stdin to browser\n\n")
-		fmt.Fprintf(os.Stderr, "usage: prog ... | montty [options...]\n\n")
+		fmt.Fprintf(os.Stderr, "usage: prog ... | %s [options...]\n\n", appName)
 		flag.PrintDefaults()
 	}
 	if version == "" {
@@ -58,7 +60,7 @@ func main() {
 			flag.Usage()
 			os.Exit(0)
 		case "--version", "-v":
-			fmt.Printf("montty v%s %s/%s\n", version, runtime.GOOS, runtime.GOARCH)
+			fmt.Printf("%s v%s %s/%s\n", appName, version, runtime.GOOS, runtime.GOARCH)
 			os.Exit(0)
 		}
 	}
