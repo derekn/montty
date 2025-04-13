@@ -37,7 +37,7 @@ func readStdin() {
 }
 
 func init() {
-	flag.StringVarP(&addr, "addr", "a", "127.0.0.1:8000", "ip:port to listen on")
+	flag.StringVarP(&addr, "address", "a", "127.0.0.1:8000", "ip:port to listen on")
 	flag.StringVarP(&title, "title", "t", "", "app title")
 	flag.IntVarP(&logBufferSize, "buffer", "b", 500, "history lines to buffer")
 	flag.BoolP("help", "h", false, "display usage help")

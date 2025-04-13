@@ -4,7 +4,6 @@ VERSION := $(shell date '+%Y.%-m.%-d')
 GIT_COMMIT := $(shell git rev-parse --short HEAD)
 PLATFORMS := $(sort darwin-amd64 darwin-arm64 linux-amd64 linux-arm64 linux-arm $(CURRENT_PLATFORM))
 
-MAKEFLAGS += -j
 .DEFAULT_GOAL := build
 .PHONY: clean update build build-all release lint $(PLATFORMS)
 
@@ -30,6 +29,7 @@ $(PLATFORMS):
 
 build: $(CURRENT_PLATFORM)
 
+build-all: MAKEFLAGS+=-j
 build-all: $(PLATFORMS)
 
 release: lint clean build-all
