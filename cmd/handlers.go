@@ -9,11 +9,11 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-//go:embed index.html.tmpl
+//go:embed templates/index.html.tmpl
 var tmplFS embed.FS
 
 var (
-	tmpl     = template.Must(template.ParseFS(tmplFS, "index.html.tmpl"))
+	tmpl     = template.Must(template.ParseFS(tmplFS, "templates/index.html.tmpl"))
 	upgrader = websocket.Upgrader{}
 )
 
