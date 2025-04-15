@@ -3,44 +3,14 @@
 <head>
 	<title>{{- if .Title }}{{ .Title }} - {{ end -}}{{ .AppName }}</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-	<style>
-		body {
-			background-color: #000;
-			color: #66FF66;
-			font-family: 'Rec Mono Linear', 'Menlo', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
-			font-size: 14px;
-			line-height: 1.2rem;
-		}
-		.stdout {
-			margin: 0 4px;
-			white-space: pre-wrap;
-			word-break: break-word;
-		}
-		.cursor {
-			display: inline-block;
-			width: 0.6ch;
-			height: 1rem;
-			background-color: currentColor;
-			vertical-align: bottom;
-			animation: blink 1s ease-in-out infinite;
-		}
-		body.disconnected .cursor {
-			background-color: darkred;
-			animation: none;
-			opacity: 100%;
-		}
-		@keyframes blink {
-			0%, 100% { opacity: 1; }
-			50% { opacity: 0; }
-		}
-	</style>
+	<style>{{ .CSS }}</style>
 	<script>
 		document.addEventListener('DOMContentLoaded', () => {
 			const content = document.getElementById('content')
 			const protocol = location.protocol == 'https:' ? 'wss:' : 'ws:'
 			const ws = new WebSocket(`${protocol}//${location.host}/ws`)
 			ws.addEventListener('message', (evt) => {
-				content.textContent += evt.data
+				content.innerHTML += evt.data
 				window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
 			})
 			ws.addEventListener('close', () => {
@@ -50,6 +20,6 @@
 	</script>
 </head>
 <body>
-	<pre class="stdout"><span id="content"></span><span class="cursor"></span></pre>
+	<div class="stdout"><span id="content"></span><span class="cursor"></span></div>
 </body>
 </html>

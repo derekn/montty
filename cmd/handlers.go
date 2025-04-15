@@ -12,6 +12,9 @@ import (
 //go:embed templates/index.html.tmpl
 var tmplFS embed.FS
 
+//go:embed templates/stylesheet.css
+var css string
+
 var (
 	tmpl     = template.Must(template.ParseFS(tmplFS, "templates/index.html.tmpl"))
 	upgrader = websocket.Upgrader{}
@@ -33,7 +36,7 @@ func handleWS(w http.ResponseWriter, r *http.Request) {
 
 	// replay history for new clients
 	logBuffer.Do(func(line []byte) {
-		if err := ws.WriteMessage(websocket.TextMessage, append(line, '\n')); err != nil {
+		if err := ws.WriteMessage(websocket.TextMessage, fmtOutput(line)); err != nil {
 			log.Println("new connection error:", err)
 			return
 		}
@@ -47,8 +50,15 @@ func handleWS(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleIndex(w http.ResponseWriter, r *http.Request) {
+	tmplData := struct {
+		AppName string
+		Title   string
+		CSS     template.CSS
+	}{
+		appName, title, template.CSS(css),
+	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if err := tmpl.Execute(w, struct{ AppName, Title string }{appName, title}); err != nil {
+	if err := tmpl.Execute(w, tmplData); err != nil {
 		log.Fatal("template error:", err)
 	}
 }

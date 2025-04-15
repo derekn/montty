@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/buildkite/terminal-to-html"
 	flag "github.com/spf13/pflag"
 )
 
@@ -23,13 +24,17 @@ var (
 	logBufferSize int
 )
 
+func fmtOutput(output []byte) []byte {
+	return append(terminal.Render(output), '\n')
+}
+
 func readStdin() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		line := scanner.Bytes()
-		fmt.Printf("%s\n", line)
-		clients.Broadcast(append(line, '\n'))
 		logBuffer.AddLine(line)
+		fmt.Printf("%s\n", line)
+		clients.Broadcast(fmtOutput(line))
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatal("error reading stdin:", err)

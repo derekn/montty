@@ -3,9 +3,10 @@ CURRENT_PLATFORM := $(shell printf '%s-%s' $$(go env GOOS GOARCH))
 VERSION := $(shell date '+%Y.%-m.%-d')
 GIT_COMMIT := $(shell git rev-parse --short HEAD)
 PLATFORMS := $(sort darwin-amd64 darwin-arm64 linux-amd64 linux-arm64 linux-arm $(CURRENT_PLATFORM))
+STYLES := $(patsubst %.scss,%.css,$(wildcard cmd/templates/*.scss))
 
 .DEFAULT_GOAL := build
-.PHONY: clean update build build-all release lint $(PLATFORMS)
+.PHONY: clean update styles build build-all release lint $(PLATFORMS)
 
 clean:
 	@rm -rf dist/
@@ -13,6 +14,11 @@ clean:
 update:
 	@go get -u ./cmd
 	@go mod tidy
+
+cmd/templates/%.css: cmd/templates/%.scss
+	@sass --style=compressed --no-source-map $< $@
+
+styles: $(STYLES)
 
 linux-arm: export GOARM=5
 $(PLATFORMS): OUTPUT=$(APP_NAME)-$@$(if $(findstring windows,$@),.exe,)
@@ -27,10 +33,10 @@ $(PLATFORMS):
 		-o '../dist/$(OUTPUT)'
 	@echo $(OUTPUT)
 
-build: $(CURRENT_PLATFORM)
+build: styles $(CURRENT_PLATFORM)
 
 build-all: MAKEFLAGS+=-j
-build-all: $(PLATFORMS)
+build-all: styles $(PLATFORMS)
 
 release: lint clean build-all
 	@find dist -type f  | parallel 'xz -z9v {}'

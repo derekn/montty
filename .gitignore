@@ -1,4 +1,5 @@
 *~
 .DS_Store
+/cmd/templates/*.css
 /dist
 Thumbs.db
