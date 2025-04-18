@@ -3,13 +3,14 @@ CURRENT_PLATFORM := $(shell printf '%s-%s' $$(go env GOOS GOARCH))
 VERSION := $(shell date '+%Y.%-m.%-d')
 GIT_COMMIT := $(shell git rev-parse --short HEAD)
 PLATFORMS := $(sort darwin-amd64 darwin-arm64 linux-amd64 linux-arm64 linux-arm $(CURRENT_PLATFORM))
-STYLES := $(patsubst %.scss,%.css,$(wildcard cmd/templates/*.scss))
+ASSETS := $(patsubst %.scss,%.css,$(wildcard cmd/templates/*.scss))
+ASSETS += $(patsubst %.src.js,%.js,$(wildcard cmd/templates/*.src.js))
 
 .DEFAULT_GOAL := build
-.PHONY: clean update styles build build-all release lint $(PLATFORMS)
+.PHONY: clean update assets build build-all release lint $(PLATFORMS)
 
 clean:
-	@rm -rf dist/
+	@rm -rf dist/ $(ASSETS)
 
 update:
 	@go get -u ./cmd
@@ -18,7 +19,10 @@ update:
 cmd/templates/%.css: cmd/templates/%.scss
 	@sass --style=compressed --no-source-map $< $@
 
-styles: $(STYLES)
+cmd/templates/%.js: cmd/templates/%.src.js
+	@esbuild --bundle --minify --platform=browser --legal-comments=none --outfile=$@ $<
+
+assets: $(ASSETS)
 
 linux-arm: export GOARM=5
 $(PLATFORMS): OUTPUT=$(APP_NAME)-$@$(if $(findstring windows,$@),.exe,)
@@ -33,12 +37,12 @@ $(PLATFORMS):
 		-o '../dist/$(OUTPUT)'
 	@echo $(OUTPUT)
 
-build: styles $(CURRENT_PLATFORM)
+build: assets $(CURRENT_PLATFORM)
 
 build-all: MAKEFLAGS+=-j
-build-all: styles $(PLATFORMS)
+build-all: $(PLATFORMS)
 
-release: lint clean build-all
+release: clean assets lint build-all
 	@find dist -type f  | parallel 'xz -z9v {}'
 	@rhash -r --printf '%{sha-256}  %f\n' dist > dist/SHA256SUMS
 	@git tag -f 'v$(VERSION)'

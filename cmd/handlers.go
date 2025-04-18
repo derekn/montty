@@ -13,7 +13,10 @@ import (
 var tmplFS embed.FS
 
 //go:embed templates/stylesheet.css
-var css string
+var embedCSS string
+
+//go:embed templates/javascript.js
+var embedJS string
 
 var (
 	tmpl     = template.Must(template.ParseFS(tmplFS, "templates/index.html.tmpl"))
@@ -54,8 +57,9 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 		AppName string
 		Title   string
 		CSS     template.CSS
+		JS      template.JS
 	}{
-		appName, title, template.CSS(css),
+		appName, title, template.CSS(embedCSS), template.JS(embedJS),
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := tmpl.Execute(w, tmplData); err != nil {

@@ -4,22 +4,9 @@
 	<title>{{- if .Title }}{{ .Title }} - {{ end -}}{{ .AppName }}</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<style>{{ .CSS }}</style>
-	<script>
-		document.addEventListener('DOMContentLoaded', () => {
-			const content = document.getElementById('content')
-			const protocol = location.protocol == 'https:' ? 'wss:' : 'ws:'
-			const ws = new WebSocket(`${protocol}//${location.host}/ws`)
-			ws.addEventListener('message', (evt) => {
-				content.innerHTML += evt.data
-				window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
-			})
-			ws.addEventListener('close', () => {
-				document.body.classList.add('disconnected')
-			})
-		})
-	</script>
+	<script>{{ .JS }}</script>
 </head>
-<body>
-	<div class="stdout"><span id="content"></span><span class="cursor"></span></div>
+<body class="connecting">
+	<div class="stdout"><span id="content"></span><span class="pre-cursor"></span><span class="cursor"></span></div>
 </body>
 </html>

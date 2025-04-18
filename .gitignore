@@ -1,5 +1,7 @@
 *~
 .DS_Store
 /cmd/templates/*.css
+/cmd/templates/*.js
+!/cmd/templates/*.src.js
 /dist
 Thumbs.db

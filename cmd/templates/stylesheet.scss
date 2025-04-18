@@ -1,12 +1,13 @@
 body {
+	@extend .term-fg2;
 	background-color: #000;
-	color: #b0f986;
 	font-family: 'Rec Mono Linear', 'SFMono-Regular', 'Menlo', 'Consolas', 'Liberation Mono', Courier, monospace;
 	font-size: 12px;
 	line-height: 1rem;
 }
 .stdout {
-	margin: 0 4px;
+	@extend .term-fg32;
+	margin: 4px;
 	white-space: pre-wrap;
 	word-break: break-word;
 	overflow-wrap: break-word;
@@ -20,10 +21,32 @@ body {
 	vertical-align: text-bottom;
 	animation: cursor-blink 1s ease-in-out infinite;
 
-	body.disconnected & {
-		background-color: #ff7070;
+	.disconnected & {
+		@extend .term-fg31;
 		animation: none;
 		opacity: 100%;
+	}
+	.connecting & {
+		@extend .term-fg33;
+	}
+}
+.pre-cursor {
+	display: none;
+
+	.disconnected & {
+		@extend .term-fg31;
+		display: inline;
+	}
+	.disconnected &::after {
+		content: '[disconnected] '
+	}
+
+	.connecting & {
+		@extend .term-fg33;
+		display: inline;
+	}
+	.connecting &::after {
+		content: 'connecting... '
 	}
 }
 
