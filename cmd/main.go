@@ -15,13 +15,17 @@ import (
 
 const appName = "montty"
 
+type Args struct {
+	Address       string
+	Title         string
+	LogBufferSize int
+}
+
 var (
-	addr          string
-	title         string
-	version       string
-	clients       *Clients
-	logBuffer     *LogBuffer
-	logBufferSize int
+	args      Args
+	version   string
+	clients   *Clients
+	logBuffer *LogBuffer
 )
 
 func fmtOutput(output []byte) []byte {
@@ -42,9 +46,9 @@ func readStdin() {
 }
 
 func init() {
-	flag.StringVarP(&addr, "address", "a", "127.0.0.1:8000", "ip:port to listen on")
-	flag.StringVarP(&title, "title", "t", "", "app title")
-	flag.IntVarP(&logBufferSize, "buffer", "b", 500, "history lines to buffer")
+	flag.StringVarP(&args.Address, "address", "a", "127.0.0.1:8000", "ip:port to listen on")
+	flag.StringVarP(&args.Title, "title", "t", "", "app title")
+	flag.IntVarP(&args.LogBufferSize, "buffer", "b", 500, "history lines to buffer")
 	flag.BoolP("help", "h", false, "display usage help")
 	flag.BoolP("version", "v", false, "display version")
 	flag.CommandLine.SortFlags = false
@@ -72,10 +76,10 @@ func main() {
 	flag.Parse()
 
 	clients = NewClients()
-	logBuffer = NewLogBuffer(int(logBufferSize))
+	logBuffer = NewLogBuffer(int(args.LogBufferSize))
 	registerRoutes()
 	go readStdin()
 
-	log.Printf("listening on http://%s\n", addr)
-	log.Fatal(http.ListenAndServe(addr, nil))
+	log.Printf("listening on http://%s\n", args.Address)
+	log.Fatal(http.ListenAndServe(args.Address, nil))
 }
