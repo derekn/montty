@@ -19,6 +19,7 @@ type Args struct {
 	Address       string
 	Title         string
 	LogBufferSize int
+	CSSUrl        string
 }
 
 var (
@@ -49,6 +50,7 @@ func init() {
 	flag.StringVarP(&args.Address, "address", "a", "127.0.0.1:8000", "ip:port to listen on")
 	flag.StringVarP(&args.Title, "title", "t", "", "app title")
 	flag.IntVarP(&args.LogBufferSize, "buffer", "b", 500, "history lines to buffer")
+	flag.StringVar(&args.CSSUrl, "css", "", "custom CSS URL")
 	flag.BoolP("help", "h", false, "display usage help")
 	flag.BoolP("version", "v", false, "display version")
 	flag.CommandLine.SortFlags = false
