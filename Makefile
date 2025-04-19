@@ -3,8 +3,8 @@ CURRENT_PLATFORM := $(shell printf '%s-%s' $$(go env GOOS GOARCH))
 VERSION := $(shell date '+%Y.%-m.%-d')
 GIT_COMMIT := $(shell git rev-parse --short HEAD)
 PLATFORMS := $(sort darwin-amd64 darwin-arm64 linux-amd64 linux-arm64 linux-arm $(CURRENT_PLATFORM))
-ASSETS := $(patsubst %.scss,%.css,$(wildcard cmd/templates/*.scss))
-ASSETS += $(patsubst %.src.js,%.js,$(wildcard cmd/templates/*.src.js))
+ASSETS := $(patsubst static/%.scss,cmd/static/%.css,$(wildcard static/*.scss))
+ASSETS += $(patsubst static/%.js,cmd/static/%.js,$(wildcard static/*.js))
 
 .DEFAULT_GOAL := build
 .PHONY: clean update assets build build-all release lint $(PLATFORMS)
@@ -16,10 +16,10 @@ update:
 	@go get -u ./cmd
 	@go mod tidy
 
-cmd/templates/%.css: cmd/templates/%.scss
+cmd/static/%.css: static/%.scss
 	@sass --style=compressed --no-source-map $< $@
 
-cmd/templates/%.js: cmd/templates/%.src.js
+cmd/static/%.js: static/%.js
 	@esbuild --bundle --minify --platform=browser --legal-comments=none --outfile=$@ $<
 
 assets: $(ASSETS)
