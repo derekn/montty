@@ -1,13 +1,15 @@
+@use 'modern-normalize.min';
+
 body {
 	@extend .term-fg2;
 	background-color: #000;
 	font-family: 'Rec Mono Linear', 'SFMono-Regular', 'Menlo', 'Consolas', 'Liberation Mono', Courier, monospace;
-	font-size: 12px;
-	line-height: 1rem;
+	font-size: 13px;
+	line-height: 1.1rem;
 }
 .stdout {
 	@extend .term-fg32;
-	margin: 4px;
+	margin: 7px 10px;
 	white-space: pre-wrap;
 	word-break: break-word;
 	overflow-wrap: break-word;
@@ -38,7 +40,7 @@ body {
 		display: inline;
 	}
 	.disconnected &::after {
-		content: '[disconnected] '
+		content: '[disconnected] ';
 	}
 
 	.connecting & {
@@ -46,7 +48,7 @@ body {
 		display: inline;
 	}
 	.connecting &::after {
-		content: 'connecting... '
+		content: 'connecting... ';
 	}
 }
 

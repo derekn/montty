@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>{{- if .Title }}{{ .Title }} - {{ end -}}{{ .AppName }}</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<title>{{ if .Title }}{{ .Title }} - {{ end }}{{ .AppName }}</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="theme-color" content="#000">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+	<link rel="apple-touch-icon" href="/static/apple-touch-icon.png" type="image/png">
 	<link rel="stylesheet" href="/static/stylesheet.css">
 	{{- if .CSSUrl }}
-	<link href="{{ .CSSUrl }}" rel="stylesheet">
+	<link rel="stylesheet" href="{{ .CSSUrl }}">
 	{{- end }}
 	<script src="/static/javascript.js" defer></script>
 </head>
