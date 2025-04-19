@@ -12,11 +12,8 @@ import (
 //go:embed templates/index.html.tmpl
 var tmplFS embed.FS
 
-//go:embed templates/stylesheet.css
-var embedCSS string
-
-//go:embed templates/javascript.js
-var embedJS string
+//go:embed static/*.css static/*.js static/*.svg static/*.png
+var staticFS embed.FS
 
 var (
 	tmpl     = template.Must(template.ParseFS(tmplFS, "templates/index.html.tmpl"))
@@ -26,6 +23,7 @@ var (
 func registerRoutes() {
 	http.HandleFunc("/", handleIndex)
 	http.HandleFunc("/ws", handleWS)
+	http.Handle("/static/", http.FileServer(http.FS(staticFS)))
 }
 
 func handleWS(w http.ResponseWriter, r *http.Request) {
@@ -56,11 +54,9 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 	tmplData := struct {
 		AppName string
 		Title   string
-		CSS     template.CSS
-		JS      template.JS
 		CSSUrl  string
 	}{
-		appName, args.Title, template.CSS(embedCSS), template.JS(embedJS), args.CSSUrl,
+		appName, args.Title, args.CSSUrl,
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := tmpl.Execute(w, tmplData); err != nil {

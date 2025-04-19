@@ -3,11 +3,11 @@
 <head>
 	<title>{{- if .Title }}{{ .Title }} - {{ end -}}{{ .AppName }}</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-	<style>{{ .CSS }}</style>
+	<link rel="stylesheet" href="/static/stylesheet.css">
 	{{- if .CSSUrl }}
 	<link href="{{ .CSSUrl }}" rel="stylesheet">
 	{{- end }}
-	<script>{{ .JS }}</script>
+	<script src="/static/javascript.js" defer></script>
 </head>
 <body class="connecting">
 	<div class="stdout"><span id="content"></span><span class="pre-cursor"></span><span class="cursor"></span></div>
