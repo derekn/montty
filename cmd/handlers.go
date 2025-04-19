@@ -58,8 +58,9 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 		Title   string
 		CSS     template.CSS
 		JS      template.JS
+		CSSUrl  string
 	}{
-		appName, args.Title, template.CSS(embedCSS), template.JS(embedJS),
+		appName, args.Title, template.CSS(embedCSS), template.JS(embedJS), args.CSSUrl,
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := tmpl.Execute(w, tmplData); err != nil {

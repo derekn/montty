@@ -29,6 +29,7 @@ i=1; while :; do echo "Hello, world $i"; ((i++)); done | montty
 -a, --address string   ip:port to listen on (default "127.0.0.1:8000")
 -t, --title string     app title
 -b, --buffer int       history lines to buffer (default 500)
+    --css string       custom CSS URL
 -h, --help             display usage help
 -v, --version          display version
 ```
