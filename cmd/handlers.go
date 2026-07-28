@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/websocket"
+	"github.com/coder/websocket"
 )
 
 //go:embed templates/index.html.tmpl
@@ -15,10 +15,7 @@ var tmplFS embed.FS
 //go:embed static/*.css static/*.js static/*.svg static/*.png
 var staticFS embed.FS
 
-var (
-	tmpl     = template.Must(template.ParseFS(tmplFS, "templates/index.html.tmpl"))
-	upgrader = websocket.Upgrader{}
-)
+var tmpl = template.Must(template.ParseFS(tmplFS, "templates/index.html.tmpl"))
 
 func registerRoutes() {
 	http.HandleFunc("/", handleIndex)
@@ -27,7 +24,7 @@ func registerRoutes() {
 }
 
 func handleWS(w http.ResponseWriter, r *http.Request) {
-	ws, err := upgrader.Upgrade(w, r, nil)
+	ws, err := websocket.Accept(w, r, nil)
 	if err != nil {
 		log.Println("upgrade connection error:", err)
 		return
@@ -37,14 +34,14 @@ func handleWS(w http.ResponseWriter, r *http.Request) {
 
 	// replay history for new clients
 	logBuffer.Do(func(line []byte) {
-		if err := ws.WriteMessage(websocket.TextMessage, fmtOutput(line)); err != nil {
+		if err := ws.Write(r.Context(), websocket.MessageText, fmtOutput(line)); err != nil {
 			log.Println("new connection error:", err)
 			return
 		}
 	})
 
 	for {
-		if _, _, err := ws.ReadMessage(); err != nil {
+		if _, _, err := ws.Read(r.Context()); err != nil {
 			break
 		}
 	}
