@@ -29,19 +29,20 @@ func (c *Clients) Delete(ws *websocket.Conn) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	delete(c.clients, ws)
-	ws.CloseNow()
+	_ = ws.CloseNow()
 }
 
 func (c *Clients) Broadcast(msg []byte) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	for ws := range c.clients {
-		ws.Write(context.Background(), websocket.MessageText, msg)
+		_ = ws.Write(context.Background(), websocket.MessageText, msg)
 	}
 }
 
 type LogBuffer struct {
 	ring *ring.Ring
+	mu   sync.RWMutex
 }
 
 func NewLogBuffer(size int) *LogBuffer {
@@ -51,14 +52,20 @@ func NewLogBuffer(size int) *LogBuffer {
 }
 
 func (r *LogBuffer) AddLine(line []byte) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	r.ring.Value = append([]byte(nil), line...)
 	r.ring = r.ring.Next()
 }
 
-func (r *LogBuffer) Do(f func([]byte)) {
+func (r *LogBuffer) Lines() [][]byte {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	lines := make([][]byte, 0, r.ring.Len())
 	r.ring.Do(func(s any) {
 		if s, ok := s.([]byte); ok {
-			f(s)
+			lines = append(lines, s)
 		}
 	})
+	return lines
 }

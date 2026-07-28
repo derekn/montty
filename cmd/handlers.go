@@ -33,12 +33,12 @@ func handleWS(w http.ResponseWriter, r *http.Request) {
 	defer clients.Delete(ws)
 
 	// replay history for new clients
-	logBuffer.Do(func(line []byte) {
+	for _, line := range logBuffer.Lines() {
 		if err := ws.Write(r.Context(), websocket.MessageText, fmtOutput(line)); err != nil {
-			log.Println("new connection error:", err)
-			return
+			log.Println("replay error:", err)
+			break
 		}
-	})
+	}
 
 	for {
 		if _, _, err := ws.Read(r.Context()); err != nil {
@@ -57,6 +57,6 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := tmpl.Execute(w, tmplData); err != nil {
-		log.Fatal("template error:", err)
+		log.Println("template error:", err)
 	}
 }

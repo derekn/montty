@@ -78,7 +78,7 @@ func main() {
 	flag.Parse()
 
 	clients = NewClients()
-	logBuffer = NewLogBuffer(int(args.LogBufferSize))
+	logBuffer = NewLogBuffer(args.LogBufferSize)
 	registerRoutes()
 	go readStdin()
 
