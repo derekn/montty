@@ -14,6 +14,9 @@ body {
 	word-break: break-word;
 	overflow-wrap: break-word;
 }
+::selection {
+	background: rgba(198, 197, 2, 0.25);
+}
 .cursor {
 	display: inline-block;
 	width: 0.8ch;

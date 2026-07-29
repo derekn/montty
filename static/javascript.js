@@ -28,12 +28,12 @@ function connect() {
 		}
 	}
 	ws.onmessage = (evt) => {
-		contentEl.innerHTML += evt.data
-		window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+		contentEl.insertAdjacentHTML('beforeend', evt.data)
+		window.scrollTo({ top: document.body.scrollHeight, behavior: 'instant' })
 	}
-	ws.onerror = (err) => {
-		// console.error('websocket error:', err)
-	}
+	// ws.onerror = (err) => {
+	// 	console.error('websocket error:', err)
+	// }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
